@@ -46,7 +46,13 @@ namespace DupeSweep
 
             gridFiles.ItemsSource = _items;
 
-            txtStatus.Text = $"{_items.Count} 件";
+            UpdateStatus();
+        }
+
+        private void UpdateStatus()
+        {
+            txtDuplicateCount.Text = $"重複:{_items.Count}件";
+            txtSelectedCount.Text = $"選択:{_items.Count(x => x.IsSelected)}件";
         }
 
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
@@ -59,44 +65,85 @@ namespace DupeSweep
             }
         }
 
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (gridFiles.SelectedItem == null)
+            var targets = _items.Where(x => x.IsSelected).ToList();
+
+            // チェックが無ければ選択行
+            if (targets.Count == 0)
             {
-                System.Windows.MessageBox.Show("ファイルを選択してください");
+                if (gridFiles.SelectedItem is FileItem item)
+                {
+                    targets.Add(item);
+                }
+            }
+
+            if (targets.Count == 0)
+            {
+                System.Windows.MessageBox.Show("削除対象が選択されていません。");
                 return;
             }
 
-            var item = (FileItem)gridFiles.SelectedItem;
-
-            // 移動
-            string destDir = @"C:\Temp\DuplicateTrash";
-            Directory.CreateDirectory(destDir);
-
             var result = System.Windows.MessageBox.Show(
-                $"選択したファイルを\n\n" +
-                $"{destDir}\n\n" +
-                $"へ移動しますか？\n\n" +
-                item.FullPath,
+                $"{targets.Count}件を削除しますか？",
                 "確認",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+                MessageBoxButton.YesNo);
 
             if (result != MessageBoxResult.Yes)
             {
                 return;
             }
 
-            string destFile = MakeUniqueFileName(destDir, item.FullPath);
+            progressBar.Value = 0;
+            txtStatus.Text = "削除中...";
 
-            System.IO.File.Move(item.FullPath, destFile);
+            await Task.Run(() =>
+            {
+                int total = targets.Count;
+                int current = 0;
 
-            System.Windows.MessageBox.Show("移動しました");
+                foreach (var item in targets)
+                {
+                    MoveToTrash(item);
 
-            // 表示更新
-            _items.Remove(item);
+                    current++;
+
+                    int percent = current * 100 / total;
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        progressBar.Value = percent;
+                        txtStatus.Text = $"削除中 {current}/{total}";
+                    });
+                }
+            });
+
+            txtStatus.Text = $"完了 {targets.Count}件移動";
+
+            var targetSet = targets.ToHashSet();
+            _items.RemoveAll(x => targetSet.Contains(x));
+
+            _items = _items
+                .GroupBy(x => x.Hash)
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g)
+                .ToList();
+
             gridFiles.ItemsSource = null;
             gridFiles.ItemsSource = _items;
+
+            UpdateStatus();
+        }
+
+        private static void MoveToTrash(FileItem item)
+        {
+            // 移動
+            string destDir = @"C:\Temp\DuplicateTrash";
+            Directory.CreateDirectory(destDir);
+
+            string destFile = MakeUniqueFileName(destDir, System.IO.Path.GetFileName(item.FullPath));
+
+            System.IO.File.Move(item.FullPath, destFile);
         }
 
         /// <summary>
@@ -129,6 +176,46 @@ namespace DupeSweep
                 }
                 index++;
             }
+        }
+
+        private void BtnSelectDuplicate_Click(object sender, EventArgs e)
+        {
+            foreach (var item in _items)
+            {
+                item.IsSelected = false;
+            }
+
+            var groups = _items.GroupBy(x => x.Hash);
+
+            foreach (var group in groups)
+            {
+                var keep = group.OrderByDescending(x => File.GetLastWriteTime(x.FullPath)).First();
+                foreach (var item in group)
+                {
+                    item.IsSelected = item != keep;
+                }
+            }
+
+            gridFiles.Items.Refresh();
+
+            UpdateStatus();
+        }
+
+        private void BtnClearSelection_Click(object sender, EventArgs e)
+        {
+            foreach (var item in _items)
+            {
+                item.IsSelected = false;
+            }
+
+            gridFiles.Items.Refresh();
+
+            UpdateStatus();
+        }
+
+        private void CheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            UpdateStatus();
         }
     }
 }

@@ -36,6 +36,8 @@
             <Button Name="btnBrowse" Content="参照" Margin="5,0,0,0" Click="BtnBrowse_Click"/>
             <Button Name="btnScan" Content="重複チェック" Margin="5,0,0,0"/>
             <Button Name="btnDelete" Content="削除" Margin="5,0,0,0" Click="BtnDelete_Click"/>
+            <Button Name="btnSelectDuplicate" Content="重複選択" Margin="5,0,0,0" Click="BtnSelectDuplicate_Click"/>
+            <Button Name="btnClearSelection" Content="選択解除" Margin="5,0,0,0" Click="BtnClearSelection_Click"/>
         </StackPanel>
 
         <ProgressBar Name="progressBar" Grid.Row="2" Margin="5" Minimum="0" Maximum="100" Height="20"/>
@@ -43,6 +45,15 @@
         <!-- 一覧 -->
         <DataGrid Name="gridFiles" Grid.Row="3" Margin="5" AutoGenerateColumns="False" SelectionMode="Single">
             <DataGrid.Columns>
+                <DataGridTemplateColumn Header="選択">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Checked="CheckBox_Changed"
+                                      Unchecked="CheckBox_Changed"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>                    
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="ファイル名" Binding="{Binding FileName}"/>
                 <DataGridTextColumn Header="サイズ" Binding="{Binding Size}"/>
                 <DataGridTextColumn Header="SHA256" Binding="{Binding Hash}" Width="250"/>
@@ -51,7 +62,15 @@
         </DataGrid>
 
         <StatusBar Grid.Row="4">
-            <TextBlock Name="txtStatus"/>
+            <StatusBarItem>
+                <TextBlock Name="txtStatus"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Name="txtDuplicateCount"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Name="txtSelectedCount"/>
+            </StatusBarItem>
         </StatusBar>
     </Grid>
 </Window>
