@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace DupeSweep
 {
@@ -29,6 +30,8 @@ namespace DupeSweep
 
         private async void BtnScan_Click(object sender, RoutedEventArgs e)
         {
+            btnScan.IsEnabled = false;
+
             var path = txtFolder.Text;
 
             var scanner = new DuplicateScanner();
@@ -37,16 +40,23 @@ namespace DupeSweep
                 scanner.Scan(path,
                     p =>
                     {
-                        Dispatcher.Invoke(() =>
+                        if ((p % 10) == 0)
                         {
-                            progressBar.Value = p;
-                            txtStatus.Text = $"SHA256計算中 {p}%";
-                        });
+                            Dispatcher.Invoke(() =>
+                            {
+                                progressBar.Value = p;
+                                txtStatus.Text = $"SHA256計算中 {p}%";
+                            });
+                        }
                     }));
+
+            progressBar.Value = 100;
 
             gridFiles.ItemsSource = _items;
 
             UpdateStatus();
+
+            btnScan.IsEnabled = true;
         }
 
         private void UpdateStatus()
@@ -97,6 +107,8 @@ namespace DupeSweep
             progressBar.Value = 0;
             txtStatus.Text = "削除中...";
 
+            List<string> errors = [];
+
             await Task.Run(() =>
             {
                 int total = targets.Count;
@@ -104,19 +116,32 @@ namespace DupeSweep
 
                 foreach (var item in targets)
                 {
-                    MoveToTrash(item);
+                    if (!MoveToTrash(item, out var error))
+                    {
+                        errors.Add($"{item.FileName}: {error}");
+                    }
 
                     current++;
 
                     int percent = current * 100 / total;
 
-                    Dispatcher.Invoke(() =>
+                    if ((current % 10) == 0)
                     {
-                        progressBar.Value = percent;
-                        txtStatus.Text = $"削除中 {current}/{total}";
-                    });
+                        Dispatcher.Invoke(() =>
+                        {
+                            progressBar.Value = percent;
+                            txtStatus.Text = $"削除中 {current}/{total}";
+                        });
+                    }
                 }
             });
+
+            if (errors.Count > 0)
+            {
+                System.Windows.MessageBox.Show($"{errors.Count}件失敗しました");
+            }
+
+            progressBar.Value = 100;
 
             txtStatus.Text = $"完了 {targets.Count}件移動";
 
@@ -135,15 +160,26 @@ namespace DupeSweep
             UpdateStatus();
         }
 
-        private static void MoveToTrash(FileItem item)
+        private static bool MoveToTrash(FileItem item, out string error)
         {
-            // 移動
-            string destDir = @"C:\Temp\DuplicateTrash";
-            Directory.CreateDirectory(destDir);
+            try
+            {
+                // 移動
+                string destDir = @"C:\Temp\DuplicateTrash";
+                Directory.CreateDirectory(destDir);
 
-            string destFile = MakeUniqueFileName(destDir, System.IO.Path.GetFileName(item.FullPath));
+                string destFile = MakeUniqueFileName(destDir, System.IO.Path.GetFileName(item.FullPath));
 
-            System.IO.File.Move(item.FullPath, destFile);
+                System.IO.File.Move(item.FullPath, destFile);
+
+                error = "";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                return false;
+            }
         }
 
         /// <summary>
