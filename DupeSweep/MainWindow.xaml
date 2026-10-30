@@ -24,9 +24,13 @@
         <!-- メニュー -->
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open_Folder"/>
+                <MenuItem Header="_Open_Folder"  Click="BtnBrowse_Click"/>
                 <Separator/>
                 <MenuItem Header="E_xit"/>
+            </MenuItem>
+            <MenuItem Header="重複を選択">
+                <MenuItem Header="最古を残す" Click="SelectOldest_Click"/>
+                <MenuItem Header="最新を残す" Click="SelectNewest_Click"/>
             </MenuItem>
         </Menu>
 

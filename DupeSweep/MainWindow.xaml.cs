@@ -216,25 +216,7 @@ namespace DupeSweep
 
         private void BtnSelectDuplicate_Click(object sender, EventArgs e)
         {
-            foreach (var item in _items)
-            {
-                item.IsSelected = false;
-            }
-
-            var groups = _items.GroupBy(x => x.Hash);
-
-            foreach (var group in groups)
-            {
-                var keep = group.OrderByDescending(x => File.GetLastWriteTime(x.FullPath)).First();
-                foreach (var item in group)
-                {
-                    item.IsSelected = item != keep;
-                }
-            }
-
-            gridFiles.Items.Refresh();
-
-            UpdateStatus();
+            SelectDuplicateFiles(true);
         }
 
         private void BtnClearSelection_Click(object sender, EventArgs e)
@@ -251,6 +233,41 @@ namespace DupeSweep
 
         private void CheckBox_Changed(object sender, RoutedEventArgs e)
         {
+            UpdateStatus();
+        }
+
+        private void SelectOldest_Click(object sender, RoutedEventArgs e)
+        {
+            SelectDuplicateFiles(false);
+        }
+
+        private void SelectNewest_Click(object sender, RoutedEventArgs e)
+        {
+            SelectDuplicateFiles(true);
+        }
+
+        private void SelectDuplicateFiles(bool keepNewest)
+        {
+            foreach (var item in _items)
+            {
+                item.IsSelected = false;
+            }
+
+            var groups = _items.GroupBy(x => x.Hash);
+
+            foreach (var group in groups)
+            {
+                var keep = keepNewest
+                    ? group.OrderByDescending(x => File.GetLastWriteTime(x.FullPath)).First()
+                    : group.OrderBy(x => File.GetLastWriteTime(x.FullPath)).First();
+                foreach (var item in group)
+                {
+                    item.IsSelected = item != keep;
+                }
+            }
+
+            gridFiles.Items.Refresh();
+
             UpdateStatus();
         }
     }
