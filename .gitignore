@@ -5,3 +5,4 @@
 /.vs
 /DupeSweep/bin/Debug/net10.0-windows
 /DupeSweep/obj
+/DupeSweep/bin/Release/net10.0-windows
