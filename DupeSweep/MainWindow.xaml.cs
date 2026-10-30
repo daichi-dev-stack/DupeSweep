@@ -30,33 +30,41 @@ namespace DupeSweep
 
         private async void BtnScan_Click(object sender, RoutedEventArgs e)
         {
-            btnScan.IsEnabled = false;
+            BusyOverlay.Visibility = Visibility.Visible;
+            try
+            {
+                btnScan.IsEnabled = false;
 
-            var path = txtFolder.Text;
+                var path = txtFolder.Text;
 
-            var scanner = new DuplicateScanner();
+                var scanner = new DuplicateScanner();
 
-            _items = await Task.Run(() =>
-                scanner.Scan(path,
-                    p =>
-                    {
-                        if ((p % 10) == 0)
+                _items = await Task.Run(() =>
+                    scanner.Scan(path,
+                        p =>
                         {
-                            Dispatcher.Invoke(() =>
+                            if ((p % 10) == 0)
                             {
-                                progressBar.Value = p;
-                                txtStatus.Text = $"SHA256計算中 {p}%";
-                            });
-                        }
-                    }));
+                                Dispatcher.Invoke(() =>
+                                {
+                                    progressBar.Value = p;
+                                    txtStatus.Text = $"SHA256計算中 {p}%";
+                                });
+                            }
+                        }));
 
-            progressBar.Value = 100;
+                progressBar.Value = 100;
 
-            gridFiles.ItemsSource = _items;
+                gridFiles.ItemsSource = _items;
 
-            UpdateStatus();
+                UpdateStatus();
 
-            btnScan.IsEnabled = true;
+                btnScan.IsEnabled = true;
+            }
+            finally
+            {
+                BusyOverlay.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void UpdateStatus()

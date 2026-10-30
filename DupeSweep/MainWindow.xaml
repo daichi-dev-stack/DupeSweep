@@ -8,73 +8,77 @@
         Title="DupeSweep" Height="450" Width="800">
     <Grid>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- Menu -->
-            <RowDefinition Height="Auto"/>
-            <!-- 検索 -->
-            <RowDefinition Height="Auto"/>
-            <!-- Progress -->
-            <RowDefinition Height="*"/>
-            <!-- DataGrid -->
-            <RowDefinition Height="Auto"/>
-            <!-- StatusBar -->
-        </Grid.RowDefinitions>
+        <!-- メイン画面 -->
+        <Grid x:Name="MainPanel">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Menu -->
+                <RowDefinition Height="Auto"/>
+                <!-- 検索 -->
+                <RowDefinition Height="Auto"/>
+                <!-- Progress -->
+                <RowDefinition Height="*"/>
+                <!-- DataGrid -->
+                <RowDefinition Height="Auto"/>
+                <!-- StatusBar -->
+            </Grid.RowDefinitions>
 
-        <!-- メニュー -->
-        <Menu Grid.Row="0">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open_Folder"  Click="BtnBrowse_Click"/>
-                <Separator/>
-                <MenuItem Header="E_xit"/>
-            </MenuItem>
-            <MenuItem Header="重複を選択">
-                <MenuItem Header="最古を残す" Click="SelectOldest_Click"/>
-                <MenuItem Header="最新を残す" Click="SelectNewest_Click"/>
-            </MenuItem>
-        </Menu>
+            <!-- メニュー -->
+            <Menu Grid.Row="0">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open_Folder"  Click="BtnBrowse_Click"/>
+                    <Separator/>
+                    <MenuItem Header="E_xit"/>
+                </MenuItem>
+                <MenuItem Header="重複を選択">
+                    <MenuItem Header="最古を残す" Click="SelectOldest_Click"/>
+                    <MenuItem Header="最新を残す" Click="SelectNewest_Click"/>
+                </MenuItem>
+            </Menu>
 
-        <!-- 操作 -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
-            <TextBox Name="txtFolder" Width="500"/>
-            <Button Name="btnBrowse" Content="参照" Margin="5,0,0,0" Click="BtnBrowse_Click"/>
-            <Button Name="btnScan" Content="重複チェック" Margin="5,0,0,0"/>
-            <Button Name="btnDelete" Content="削除" Margin="5,0,0,0" Click="BtnDelete_Click"/>
-            <Button Name="btnSelectDuplicate" Content="重複選択" Margin="5,0,0,0" Click="BtnSelectDuplicate_Click"/>
-            <Button Name="btnClearSelection" Content="選択解除" Margin="5,0,0,0" Click="BtnClearSelection_Click"/>
-        </StackPanel>
+            <!-- 操作 -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="5">
+                <TextBox Name="txtFolder" Width="500"/>
+                <Button Name="btnBrowse" Content="参照" Margin="5,0,0,0" Click="BtnBrowse_Click"/>
+                <Button Name="btnScan" Content="重複チェック" Margin="5,0,0,0"/>
+                <Button Name="btnDelete" Content="削除" Margin="5,0,0,0" Click="BtnDelete_Click"/>
+                <Button Name="btnSelectDuplicate" Content="重複選択" Margin="5,0,0,0" Click="BtnSelectDuplicate_Click"/>
+                <Button Name="btnClearSelection" Content="選択解除" Margin="5,0,0,0" Click="BtnClearSelection_Click"/>
+            </StackPanel>
 
-        <ProgressBar Name="progressBar" Grid.Row="2" Margin="5" Minimum="0" Maximum="100" Height="20"/>
+            <ProgressBar Name="progressBar" Grid.Row="2" Margin="5" Minimum="0" Maximum="100" Height="20"/>
 
-        <!-- 一覧 -->
-        <DataGrid Name="gridFiles" Grid.Row="3" Margin="5" AutoGenerateColumns="False" SelectionMode="Single">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="選択">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Checked="CheckBox_Changed"
-                                      Unchecked="CheckBox_Changed"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>                    
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="ファイル名" Binding="{Binding FileName}"/>
-                <DataGridTextColumn Header="サイズ" Binding="{Binding Size}"/>
-                <DataGridTextColumn Header="SHA256" Binding="{Binding Hash}" Width="250"/>
-                <DataGridTextColumn Header="フルパス" Binding="{Binding FullPath}"/>
-            </DataGrid.Columns>
-        </DataGrid>
+            <!-- 一覧 -->
+            <DataGrid Name="gridFiles" Grid.Row="3" Margin="5" AutoGenerateColumns="False" SelectionMode="Single">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="選択">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="CheckBox_Changed" Unchecked="CheckBox_Changed"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>                    
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="ファイル名" Binding="{Binding FileName}"/>
+                    <DataGridTextColumn Header="サイズ" Binding="{Binding Size}"/>
+                    <DataGridTextColumn Header="SHA256" Binding="{Binding Hash}" Width="250"/>
+                    <DataGridTextColumn Header="フルパス" Binding="{Binding FullPath}"/>
+                </DataGrid.Columns>
+            </DataGrid>
 
-        <StatusBar Grid.Row="4">
-            <StatusBarItem>
-                <TextBlock Name="txtStatus"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock Name="txtDuplicateCount"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock Name="txtSelectedCount"/>
-            </StatusBarItem>
-        </StatusBar>
+            <StatusBar Grid.Row="4">
+                <StatusBarItem>
+                    <TextBlock Name="txtStatus"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock Name="txtDuplicateCount"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock Name="txtSelectedCount"/>
+                </StatusBarItem>
+            </StatusBar>
+        </Grid>
+
+        <!-- 処理中オーバーレイ -->
+        <Grid x:Name="BusyOverlay" Visibility="Collapsed" Background="#30000000" Panel.ZIndex="999"/>
     </Grid>
 </Window>
