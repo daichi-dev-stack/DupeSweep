@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DupeSweep.Core
+namespace DupeSweep.Models
 {
     public class FileItem
     {

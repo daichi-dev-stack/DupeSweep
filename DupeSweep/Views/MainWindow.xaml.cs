@@ -1,19 +1,11 @@
 ﻿using DupeSweep.Core;
+using DupeSweep.Models;
 using DupeSweep.ViewModel;
 using System.IO;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace DupeSweep
+namespace DupeSweep.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -35,7 +27,6 @@ namespace DupeSweep
 
         private async void BtnScan_Click(object sender, RoutedEventArgs e)
         {
-            //BusyOverlay.Visibility = Visibility.Visible;
             _viewModel.IsBusy = true;
 
             try
@@ -54,13 +45,13 @@ namespace DupeSweep
                             {
                                 Dispatcher.Invoke(() =>
                                 {
-                                    progressBar.Value = p;
+                                    _viewModel.Progress = p;
                                     txtStatus.Text = $"SHA256計算中 {p}%";
                                 });
                             }
                         }));
 
-                progressBar.Value = 100;
+                _viewModel.Progress = 100;
 
                 gridFiles.ItemsSource = _items;
 
@@ -70,7 +61,6 @@ namespace DupeSweep
             }
             finally
             {
-                //BusyOverlay.Visibility = Visibility.Collapsed;
                 _viewModel.IsBusy = false;
             }
         }
@@ -120,7 +110,7 @@ namespace DupeSweep
                 return;
             }
 
-            progressBar.Value = 0;
+            _viewModel.Progress = 0;
             txtStatus.Text = "削除中...";
 
             List<string> errors = [];
@@ -145,7 +135,7 @@ namespace DupeSweep
                     {
                         Dispatcher.Invoke(() =>
                         {
-                            progressBar.Value = percent;
+                            _viewModel.Progress = percent;
                             txtStatus.Text = $"削除中 {current}/{total}";
                         });
                     }
@@ -157,7 +147,7 @@ namespace DupeSweep
                 System.Windows.MessageBox.Show($"{errors.Count}件失敗しました");
             }
 
-            progressBar.Value = 100;
+            _viewModel.Progress = 100;
 
             txtStatus.Text = $"完了 {targets.Count}件移動";
 

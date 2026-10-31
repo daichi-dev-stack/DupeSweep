@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace DupeSweep.ViewModel
 {
@@ -16,6 +13,18 @@ namespace DupeSweep.ViewModel
             set
             {
                 _isBusy = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double _progress;
+
+        public double Progress
+        {
+            get => _progress;
+            set
+            {
+                _progress = value;
                 OnPropertyChanged();
             }
         }

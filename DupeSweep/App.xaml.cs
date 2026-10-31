@@ -1,8 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-
-namespace DupeSweep
+﻿namespace DupeSweep
 {
     /// <summary>
     /// Interaction logic for App.xaml
