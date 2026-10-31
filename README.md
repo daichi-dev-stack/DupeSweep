@@ -27,11 +27,11 @@ DupeSweep は SHA256 ハッシュを利用して重複ファイルを検出し�
 
 ### 重複ファイル検索
 
-![重複ファイル検索](Docs/Scan.png)
+![重複ファイル検索](DupeSweep/Docs/Scan.png)
 
 ### 重複ファイル選択
 
-![重複ファイル選択](Docs/Select.png)
+![重複ファイル選択](DupeSweep/Docs/Select.png)
 
 ## 使い方
 
