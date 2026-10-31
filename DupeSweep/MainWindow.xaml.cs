@@ -1,4 +1,5 @@
 ﻿using DupeSweep.Core;
+using DupeSweep.ViewModel;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -20,17 +21,23 @@ namespace DupeSweep
     public partial class MainWindow : Window
     {
         private List<FileItem> _items = [];
+        private readonly MainViewModel _viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            _viewModel = new MainViewModel();
+            DataContext = _viewModel;
 
             btnScan.Click += BtnScan_Click;
         }
 
         private async void BtnScan_Click(object sender, RoutedEventArgs e)
         {
-            BusyOverlay.Visibility = Visibility.Visible;
+            //BusyOverlay.Visibility = Visibility.Visible;
+            _viewModel.IsBusy = true;
+
             try
             {
                 btnScan.IsEnabled = false;
@@ -63,7 +70,8 @@ namespace DupeSweep
             }
             finally
             {
-                BusyOverlay.Visibility = Visibility.Collapsed;
+                //BusyOverlay.Visibility = Visibility.Collapsed;
+                _viewModel.IsBusy = false;
             }
         }
 

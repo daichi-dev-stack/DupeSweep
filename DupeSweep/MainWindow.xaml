@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:DupeSweep"
         mc:Ignorable="d"
         Title="DupeSweep" Height="450" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </Window.Resources>
     <Grid>
 
         <!-- メイン画面 -->
@@ -79,6 +82,9 @@
         </Grid>
 
         <!-- 処理中オーバーレイ -->
-        <Grid x:Name="BusyOverlay" Visibility="Collapsed" Background="#30000000" Panel.ZIndex="999"/>
+        <Grid x:Name="BusyOverlay"
+              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}"
+              Background="#30000000"
+              Panel.ZIndex="999"/>
     </Grid>
 </Window>
