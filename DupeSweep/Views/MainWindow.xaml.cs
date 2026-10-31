@@ -31,6 +31,11 @@ namespace DupeSweep.Views
 
             try
             {
+                if (txtFolder.Text == "")
+                {
+                    return;
+                }
+
                 btnScan.IsEnabled = false;
 
                 var path = txtFolder.Text;
@@ -220,9 +225,10 @@ namespace DupeSweep.Views
             }
         }
 
-        private void BtnSelectDuplicate_Click(object sender, EventArgs e)
+        private void BtnSelect_Click(object sender, RoutedEventArgs e)
         {
-            SelectDuplicateFiles(true);
+            btnSelect.ContextMenu.PlacementTarget = btnSelect;
+            btnSelect.ContextMenu.IsOpen = true;
         }
 
         private void BtnClearSelection_Click(object sender, EventArgs e)
