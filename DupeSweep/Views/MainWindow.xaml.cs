@@ -86,6 +86,11 @@ namespace DupeSweep.Views
             }
         }
 
+        private void MenuExit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         private async void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             var targets = _items.Where(x => x.IsSelected).ToList();

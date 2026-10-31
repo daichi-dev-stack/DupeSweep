@@ -32,7 +32,7 @@
                 <MenuItem Header="_File">
                     <MenuItem Header="_Open_Folder"  Click="BtnBrowse_Click"/>
                     <Separator/>
-                    <MenuItem Header="E_xit"/>
+                    <MenuItem Header="E_xit" Click="MenuExit_Click"/>
                 </MenuItem>
             </Menu>
 
