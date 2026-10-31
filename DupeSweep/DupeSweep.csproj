@@ -14,4 +14,8 @@
     <Content Include="Assets\DupeSweep.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Docs\" />
+  </ItemGroup>
+
 </Project>
