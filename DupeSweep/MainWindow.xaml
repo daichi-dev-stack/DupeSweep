@@ -9,6 +9,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
     </Window.Resources>
+    
     <Grid>
 
         <!-- メイン画面 -->
